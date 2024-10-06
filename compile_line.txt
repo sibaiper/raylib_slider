@@ -1,0 +1,3 @@
+gcc -o slider_component main.c slider.c -I/usr/local/include -L/usr/local/lib -lraylib -lGL -lm -lpthread -ldl
+
+(for linux with the Raylib prerequisites installed on ur machine)
