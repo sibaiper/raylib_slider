@@ -1,10 +1,11 @@
 #include "slider.h"
+#include <raylib.h>
 #include <raymath.h>
 #include <stdio.h>
 
 void update_slider_position(Custom_slider *s) {
   if (!IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-    s->rect.x = GetMouseX() + 20;
+    s->rect.x = GetMouseX();
     s->rect.y = GetMouseY() + 20;
   }
 }
@@ -121,4 +122,57 @@ void draw_slider(Custom_slider *s) {
   // draw the text on the side of the slider;
   DrawText(buffer, s->rect.x + s->rect.width - (text_width + padding),
            center_height, fontSize, Fade(BLACK, s->opacity));
+}
+
+// no need for these?
+float ORIGINAL_WIDTH = -1.0f;
+float ORIGINAL_X = -1.0f;
+/*
+ *
+ * should probably save the value of the mouse position as soon as the value
+ * exceeds the max whilst clicking. and get the distance from THERE.
+ *
+ */
+void update_rect_on_out_of_bounds(Custom_slider *s) {
+
+  static float original_width = -1.0f;
+  static float original_x = -1.0f;
+  static float resist_power =
+      0.05; /* the higher this value, the less it will strech */
+  // initialize original_width only if it has not been set before
+  if (original_width < 0.0f) {
+    original_width = s->rect.width;
+  }
+  if (original_x < 0.0f) {
+    original_x = GetMouseX();
+    printf("Initializing original_x: %.2f\n", original_x);
+  }
+  static float distance_from_rect = -1.0f;
+
+  if (s->opacity > 0.1f && GetMouseX() > s->rect.x + s->rect.width) {
+    // handle dragging past the max value
+    distance_from_rect = GetMouseX() - (s->rect.x + s->rect.width);
+
+    // reduce the stretching amount the further the mouse is from the max value
+    float stretching_factor = 1.0f / (1.0f + distance_from_rect * resist_power);
+    float stretching_amount = distance_from_rect * stretching_factor;
+
+    s->rect.width = original_width + stretching_amount;
+
+  } else if (s->opacity > 0.1f && GetMouseX() < s->rect.x) {
+
+    distance_from_rect = original_x - GetMouseX();
+    //  for the other direction: move the rect by x amount the left, while also
+    //  streching it to the right
+    float stretching_factor = 1.0f / (1.0f + distance_from_rect * resist_power);
+    float stretching_amount = distance_from_rect * stretching_factor;
+
+    s->rect.width = original_width + stretching_amount;
+    s->rect.x = original_x - stretching_amount;
+  } else if (!IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+    distance_from_rect = -1.0f;
+    s->rect.width = original_width;
+    original_width = -1.0f;
+    original_x = -1.0f;
+  }
 }

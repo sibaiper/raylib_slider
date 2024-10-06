@@ -49,6 +49,7 @@ int main(void) {
     update_opacity_value(&my_slider);
     update_slider_value(&my_slider, callback);
     update_slider_position(&my_slider);
+    update_rect_on_out_of_bounds(&my_slider);
 
     // draw the slider and other stuff
     BeginDrawing();

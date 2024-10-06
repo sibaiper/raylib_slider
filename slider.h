@@ -22,6 +22,7 @@ typedef void (*SliderValueUpdateCallback)(float new_value);
 void update_slider_position(Custom_slider *s);
 void update_slider_value(Custom_slider *s, SliderValueUpdateCallback callback);
 void update_opacity_value(Custom_slider *s);
+void update_rect_on_out_of_bounds(Custom_slider *s);
 void draw_slider(Custom_slider *s);
 
 #endif // CUSTOM_SLIDER_H
